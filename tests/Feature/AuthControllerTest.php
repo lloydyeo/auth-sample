@@ -4,7 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithoutMiddleware;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\Auth\VerifyEmail;
 use Tests\TestCase;
 
 class AuthControllerTest extends TestCase
@@ -13,7 +14,9 @@ class AuthControllerTest extends TestCase
 
     public function testRegistration() : void
     {
-        $response = $this->followingRedirects()->post(route('auth.register'), [
+        Notification::fake();
+
+        $this->followingRedirects()->post(route('auth.register'), [
             'name' => 'Tester',
             'email' => 'lloyd@lloydyeo.com',
             'password' => 'Password123!@#',
@@ -25,7 +28,10 @@ class AuthControllerTest extends TestCase
         $this->assertDatabaseHas('users', [
             'name' => 'Tester',
             'email' => 'lloyd@lloydyeo.com',
+            'email_verified_at' => null,
         ]);
+
+        Notification::assertSentTo(User::first(), VerifyEmail::class);
     }
 
     public function testInvalidRegistration() : void
@@ -37,7 +43,7 @@ class AuthControllerTest extends TestCase
         ]);
 
         // Existing user
-        $response = $this->from('register')->post(route('auth.register'), [
+        $this->from('register')->post(route('auth.register'), [
             'name' => 'Test',
             'email' => 'lloyd@lloydyeo.com',
             'password' => 'Password123!@#',
@@ -45,7 +51,7 @@ class AuthControllerTest extends TestCase
         ])->assertRedirect('register')->assertSessionHasErrors(['email']);
 
         // Invalid Email
-        $response = $this->from('register')->post(route('auth.register'), [
+        $this->from('register')->post(route('auth.register'), [
             'name' => 'Test',
             'email' => 'lloyd',
             'password' => 'password123!@#',
@@ -53,7 +59,7 @@ class AuthControllerTest extends TestCase
         ])->assertRedirect('register')->assertSessionHasErrors(['email']);
 
         // Passwords don't match
-        $response = $this->from('register')->post(route('auth.register'), [
+        $this->from('register')->post(route('auth.register'), [
             'name' => 'Test',
             'email' => 'lloyd@lloydyeo2.com',
             'password' => 'password123!@#',
@@ -61,7 +67,7 @@ class AuthControllerTest extends TestCase
         ])->assertRedirect('register')->assertSessionHasErrors(['password']);
 
         // Weak Password
-        $response = $this->from('register')->post(route('auth.register'), [
+        $this->from('register')->post(route('auth.register'), [
             'name' => 'Test',
             'email' => 'lloyd',
             'password' => 'password123!@#',

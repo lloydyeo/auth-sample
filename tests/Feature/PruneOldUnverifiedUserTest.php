@@ -12,15 +12,6 @@ class PruneOldUnverifiedUserTest extends TestCase
 
     public function testPruneCondition() : void
     {
-        $this->getUsers();
-        $this->artisan('model:prune')->assertSuccessful();
-        $this->assertDatabaseHas('users', ['id' => 1]);
-        $this->assertDatabaseHas('users', ['id' => 3]);
-        $this->assertDatabaseMissing('users', ['id' => 2]);
-    }
-
-    public function getUsers() : void
-    {
         User::insert([
             [
                 'id' => 1,
@@ -47,5 +38,11 @@ class PruneOldUnverifiedUserTest extends TestCase
                 'created_at' => now()->subDays(3),
             ],
         ]);
+
+        $this->artisan('model:prune')->assertSuccessful();
+        $this->assertDatabaseHas('users', ['id' => 1]);
+        $this->assertDatabaseHas('users', ['id' => 3]);
+        $this->assertDatabaseMissing('users', ['id' => 2]);
     }
+
 }
