@@ -15,42 +15,92 @@
         </style>
 
         <style>
+            .mt-0 {
+                margin-top:0!important;
+            }
             body {
                 font-family: 'Nunito', sans-serif;
+            }
+            .form-group {
+                display:flex;
+                flex-direction: row;
+            }
+            .form-group > label {
+                min-width: 10em;
+                margin-right: 1.5em;
+            }
+            .form-group > input {
+                flex: 1;
+                border: 1px solid #ccc;
+            }
+            .register-btn {
+                padding: 1em 1.5em;
+                border-radius:1em;
+                border: 1px solid #ccc;
+                background-color: lightgreen;
+                cursor:pointer;
+            }
+            .text-red-500 {
+                color: red;
             }
         </style>
     </head>
     <body class="antialiased">
         <div class="relative flex items-top justify-center min-h-screen bg-gray-100 dark:bg-gray-900 sm:items-center py-4 sm:pt-0">
-            @guest
-                <div class="fixed top-0 right-0 px-6 py-4 sm:block">
-                    <a href="{{ route('login') }}" class="text-sm text-gray-700 dark:text-gray-500 underline">Log in</a>
-                    <a href="{{ route('register') }}" class="ml-4 text-sm text-gray-700 dark:text-gray-500 underline">Register</a>
-                </div>
-            @endguest
-
-            @auth
-                <div class="fixed top-0 right-0 px-6 py-4 sm:block">
-                    <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="text-sm text-gray-700 dark:text-gray-500 underline">Logout</a>
-                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+            <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow sm:rounded-lg">
+                    <form id="register-form" class="p-6" method="POST" action="{{ route('auth.register') }}" onsubmit="return validateForm();">
                         @csrf
+                        <h2 class="mt-0">Register</h2>
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input required id="name" type="text" name="name" />
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input required id="email" type="email" name="email" />
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input required id="password" type="password" name="password" />
+                        </div>
+                        <div class="form-group">
+                            <label for="password_confirmation">Confirm Password</label>
+                            <input required id="password_confirmation" type="password" name="password_confirmation" />
+                        </div>
+                        <div class="form-group mt-4">
+                            <button class="register-btn" type="submit">Register</button>
+                        </div>
+                        <div id="errors-list" class="mt-4">
+                            @if($errors->any())
+                                {!! implode('', $errors->all('<p class="text-red-500">:message</p>')) !!}
+                            @endif
+                        </div>
                     </form>
                 </div>
-            @endauth
-
-
-            <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">
-                @guest
-                    <div class="p-6 text-center bg-white dark:bg-gray-800 overflow-hidden shadow sm:rounded-lg">
-                        <h3>Welcome, you may login/register using the links<br/>on the top right hand corner.</h3>
-                    </div>
-                @endguest
-                @auth
-                    <div class="p-6 text-center bg-white dark:bg-gray-800 overflow-hidden shadow sm:rounded-lg">
-                        <h3>Welcome back, {{ Auth::user()->name }}</h3>
-                    </div>
-                @endauth
             </div>
         </div>
     </body>
+    <script>
+        const strongPasswordRegex = new RegExp("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$");
+        function validateForm() {
+            // return true;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            console.log(password);
+            const password_confirmation = document.getElementById('password_confirmation').value;
+            const errorsList = document.getElementById('errors-list');
+            errorsList.innerHTML = '';
+            if (email.length === 0 || password.length === 0 || password_confirmation.length === 0) {
+                errorsList.innerHTML += '<p class="text-red-500">All fields are required</p>';
+            }
+            if (password !== password_confirmation) {
+                errorsList.innerHTML += '<p class="text-red-500">Passwords do not match</p>';
+            }
+            if (!strongPasswordRegex.test(password)) {
+                errorsList.innerHTML += '<p class="text-red-500">Password must contain at least one number, one lowercase letter, one uppercase letter, and one special character</p>';
+            }
+            return errorsList.innerHTML.length === 0;
+        }
+    </script>
 </html>

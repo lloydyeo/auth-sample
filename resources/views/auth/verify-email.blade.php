@@ -22,34 +22,11 @@
     </head>
     <body class="antialiased">
         <div class="relative flex items-top justify-center min-h-screen bg-gray-100 dark:bg-gray-900 sm:items-center py-4 sm:pt-0">
-            @guest
-                <div class="fixed top-0 right-0 px-6 py-4 sm:block">
-                    <a href="{{ route('login') }}" class="text-sm text-gray-700 dark:text-gray-500 underline">Log in</a>
-                    <a href="{{ route('register') }}" class="ml-4 text-sm text-gray-700 dark:text-gray-500 underline">Register</a>
-                </div>
-            @endguest
-
-            @auth
-                <div class="fixed top-0 right-0 px-6 py-4 sm:block">
-                    <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="text-sm text-gray-700 dark:text-gray-500 underline">Logout</a>
-                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                        @csrf
-                    </form>
-                </div>
-            @endauth
-
-
             <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">
-                @guest
-                    <div class="p-6 text-center bg-white dark:bg-gray-800 overflow-hidden shadow sm:rounded-lg">
-                        <h3>Welcome, you may login/register using the links<br/>on the top right hand corner.</h3>
-                    </div>
-                @endguest
-                @auth
-                    <div class="p-6 text-center bg-white dark:bg-gray-800 overflow-hidden shadow sm:rounded-lg">
-                        <h3>Welcome back, {{ Auth::user()->name }}</h3>
-                    </div>
-                @endauth
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow sm:rounded-lg">
+                    <h3>An email has been to sent to your email address.</h3>
+                    <h3>Click on the link inside to verify your account.</h3>
+                </div>
             </div>
         </div>
     </body>
