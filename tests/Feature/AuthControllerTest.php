@@ -74,4 +74,33 @@ class AuthControllerTest extends TestCase
             'password_confirmation' => 'password123!@#'
         ])->assertRedirect('register')->assertSessionHasErrors(['password']);
     }
+
+    public function testLogin() : void
+    {
+        $user = User::create([
+            'name' => 'Tester',
+            'email' => 'lloyd@lloydyeo.com',
+            'password' => bcrypt('Password123!@#')
+        ]);
+
+        $this->post(route('auth.login'), [
+            'email' => 'lloyd@lloydyeo.com',
+            'password' => 'Password123!@#'
+        ])->assertRedirect('/');
+
+        $this->assertAuthenticatedAs($user);
+    }
+
+    public function testLogout() : void
+    {
+        $user = User::create([
+            'name' => 'Tester',
+            'email' => 'lloyd@lloydyeo.com',
+            'password' => bcrypt('Password123!@#')
+        ]);
+
+        $this->actingAs($user)->post(route('logout'))->assertRedirect('/');
+
+        $this->assertGuest();
+    }
 }
